@@ -5,13 +5,13 @@ const mailSender = async(email,title,body)=>{
     try {
 
         const transporter = nodemailer.createTransport({
-            host: 	"smtp.gmail.com",
-            port: 465,
-            secure: true,
+            host: 	process.env.MAIL_HOST ,
+            port: process.env.MAIL_PORT || 465,
+            secure: process.env.MAIL_SECURE || true, // true for 465, false for other ports
 
             auth: {
-                user: "gargrakshit10@gmail.com",
-                pass:"lvoamjnpkkntirdk",
+                user: process.env.MAIL_USER,
+                pass: process.env.MAIL_PASS,
             },
         });
         // console.log('Mail transporter created successfully.');
@@ -22,7 +22,7 @@ const mailSender = async(email,title,body)=>{
             subject: title, // Subject line
             html: body, // html body
         });
-        console.log('Creating mail transporter...');
+        // console.log('Creating mail transporter...');
 
         return info;
         
