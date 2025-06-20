@@ -18,8 +18,7 @@ const mailSender = async(email,title,body)=>{
             from: `"LearnSpark" <${process.env.MAIL_USER}>`, // sender address
             to: email, // list of receivers
             subject: title, // Subject line
-            text: body, // plain text body
-           html: `<p>${body}</p>`, // html body
+           html: body, // html body
         });
 
         return info;
