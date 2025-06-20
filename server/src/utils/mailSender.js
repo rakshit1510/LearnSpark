@@ -3,23 +3,26 @@ import nodemailer from 'nodemailer';
 const mailSender = async(email,title,body)=>{
     
     try {
-        
+
         const transporter = nodemailer.createTransport({
-            host: process.env.SMTP_HOST,
-            port: process.env.SMTP_PORT,
-            secure: process.env.SMTP_SECURE === 'true',
+            host: 	"smtp.gmail.com",
+            port: 465,
+            secure: true,
+
             auth: {
-                user: process.env.MAIL_USER,
-                pass: process.env.MAIL_PASS,
+                user: "gargrakshit10@gmail.com",
+                pass:"lvoamjnpkkntirdk",
             },
         });
-
+        // console.log('Mail transporter created successfully.');
+        // console.log(transporter);
         const info = await transporter.sendMail({
-            from: `"LearnSpark" <${process.env.MAIL_USER}>`, // sender address
+            from: "LearnSpark",
             to: email, // list of receivers
             subject: title, // Subject line
-           html: body, // html body
+            html: body, // html body
         });
+        console.log('Creating mail transporter...');
 
         return info;
         
