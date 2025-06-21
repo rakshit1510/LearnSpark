@@ -5,6 +5,7 @@ import { uploadOnCloudinary } from "../utils/Cloudinary.js";
 import {ApiResponse} from '../utils/ApiResponse.js'
 import mongoose from "mongoose";
 import jwt from 'jsonwebtoken'
+import bcrypt from "bcrypt"
 import otpGenerator from 'otp-generator'
 import mailSender from "../utils/mailSender.js";
 import OTP from "../models/OTP.model.js";
@@ -14,7 +15,11 @@ import passwordUpdated from "../email/templates/passwordUpdate.js";
 const generateAccessAndRefreshToken= async(userId)=>{
     try {
         const user=await User.findById(userId);
+        if(!user){
+            throw new ApiError(404, "User not found");
+        }
         const accessToken=user.generateAccessToken()
+        // console.log("Generating access and refresh token for user:", user.email);
         const refreshToken=user.generateRefreshToken()
         user.refreshToken=refreshToken
 
@@ -190,11 +195,11 @@ const login = asyncHandler(async (req, res) => {
 
 const logout = asyncHandler(async (req, res) => {
     try {
-        const userId = req.user._id;
+        const userId = req.user;
         if (!userId) {
             throw new ApiError(400, "User not found");
         }
-        const user = await User.findById(userId);
+        const user = await User.findById(userId._id);
         if (!user) {
             throw new ApiError(404, "User not found");
         }

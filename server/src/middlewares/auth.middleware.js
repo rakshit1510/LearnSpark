@@ -26,3 +26,37 @@ export const verifyJWT = asyncHandler( async (req,res,next)=>{
         throw new ApiError(401,error?.message || "Invalid access token")
     }
 })
+
+
+export const isStudent = asyncHandler(async (req, res, next) => {
+    try {
+        if (req.user?.accountType !== 'Student') {
+            throw new ApiError(401, 'This page is protected only for students');
+        }
+        next();
+    } catch (error) {
+        throw new ApiError(401, error?.message || 'Unauthorized');
+    }
+});
+
+export const isInstructor = asyncHandler(async (req, res, next) => {
+    try {
+        if (req.user?.accountType !== 'Instructor') {
+            throw new ApiError(401, 'This page is protected only for instructors');
+        }
+        next();
+    } catch (error) {
+        throw new ApiError(401, error?.message || 'Unauthorized');
+    }
+});
+
+export const isAdmin = asyncHandler(async (req, res, next) => {
+    try {
+        if (req.user?.accountType !== 'Admin') {
+            throw new ApiError(401, 'This page is protected only for admins');
+        }
+        next();
+    } catch (error) {
+        throw new ApiError(401, error?.message || 'Unauthorized');
+    }
+});

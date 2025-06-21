@@ -1,5 +1,7 @@
 import mongoose from "mongoose";
-
+import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
+import dotenv from "dotenv";
 const userSchema = new mongoose.Schema({
      firstName: {
             type: String,
@@ -65,6 +67,13 @@ const userSchema = new mongoose.Schema({
 // "methods" is a hook in mongoose which
 //  allows you to made your own middlewares
 
+userSchema.pre("save",async function(next){
+    if(!this.isModified("password"))return next();
+    this.password= await bcrypt.hash(this.password,10)
+    next();
+})
+
+
 userSchema.methods.isPasswordCorrect=async function(password){
     return await bcrypt.compare(password,this.password)  //here "this" is the context of user using this function
 }
@@ -74,8 +83,8 @@ userSchema.methods.generateAccessToken= function(){
         {
             _id:this._id,
             email:this.email,
-            username:this.username,
-            fullname:this.fullname,
+            firstName:this.firstName,
+            lastName:this.lastName
         },
         process.env.ACCESS_TOKEN_SECRET,
         {
