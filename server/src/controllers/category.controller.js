@@ -135,15 +135,6 @@ function getRandomInt(max) {
     }
 });
 
-
-import { Category } from '../models/category.model.js';
-import { asyncHandler } from '../utils/asyncHandler.js';
-import { ApiError } from '../utils/ApiError.js';
-import { ApiResponse } from '../utils/ApiResponse.js';
-
-// Helper: Random integer between 0 and max - 1
-const getRandomInt = (max) => Math.floor(Math.random() * max);
-
 // ================ Get Category Page Details ================
  const getCategoryPageDetails = asyncHandler(async (req, res) => {
     try {
@@ -213,7 +204,7 @@ const getRandomInt = (max) => Math.floor(Math.random() * max);
 
 
 
-export{
+export {
     createCategory,
     deleteCategory,
     showAllCategories,

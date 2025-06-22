@@ -19,7 +19,5 @@ router.route('/getEnrolledCourses').get(verifyJWT, getEnrolledCourses);
 router.route('/getUserDetails').get(verifyJWT, getUserDetails);
 router.route('/updateUserProfileImage').put(verifyJWT, upload.single('profileImage'), updateUserProfileImage);
 router.route('/instructorDashboard').get(verifyJWT, isInstructor, instructorDashboard);
-router.route('/getAllStudents').get(verifyJWT, isAdmin, getAllStudents);
-router.route('/getAllInstructors').get(verifyJWT, isAdmin, getAllInstructors);
 export default router;
 /* Profile routes for user management and dashboard operations */
