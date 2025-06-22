@@ -1,5 +1,4 @@
-const mongoose = require('mongoose');
-
+import mongoose from "mongoose";
 const subSectionSchema = new mongoose.Schema({
     title: {
         type: String
