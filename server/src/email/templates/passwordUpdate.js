@@ -1,4 +1,4 @@
-const passwordUpdated = (email, name) => {
+const passwordUpdated = (email, url) => {
   return `<!DOCTYPE html>
   <html lang="en">
   
@@ -68,21 +68,39 @@ const passwordUpdated = (email, name) => {
         margin: 20px auto;
         font-weight: 500;
       }
+
+      .button {
+        display: inline-block;
+        margin-top: 20px;
+        padding: 10px 24px;
+        background-color: #3b82f6;
+        color: white;
+        text-decoration: none;
+        border-radius: 8px;
+        font-weight: 600;
+      }
     </style>
   </head>
   
   <body>
     <div class="container">
-       <a href="https://ibb.co/VYBQYvcQ"><img src="https://i.ibb.co/d4KL4QwL/Screenshot-2025-06-20-231953.png" alt="Screenshot-2025-06-20-231953" border="0"></a>
-       
+      <a href="https://ibb.co/VYBQYvcQ">
+        <img src="https://i.ibb.co/d4KL4QwL/Screenshot-2025-06-20-231953.png" alt="LearnSpark Logo" class="logo" />
+      </a>
+      
       <div class="title">Password Successfully Updated</div>
+      
       <div class="content">
-        <p>Hi ${name},</p>
+        <p>Hi there,</p>
         <p>This is a confirmation that the password for your account associated with <span class="highlight">${email}</span> has been changed successfully.</p>
+        
         <div class="alert">
           If you did not request this change, please contact our support team immediately.
         </div>
+
+        <a href="${url}" class="button">Login to LearnSpark</a>
       </div>
+      
       <div class="footer">
         Need help? Contact us at 
         <a href="mailto:support@learnspark.in">support@learnspark.in</a>
