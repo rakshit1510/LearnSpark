@@ -32,7 +32,7 @@ const createCourse = asyncHandler(async (req, res, next) => {
       return next(new ApiError(401, "Unauthorized: Instructor ID is required"));
     }
     const instructor = await User.findById(instructorId);
-    if (!instructor || instructor.role !== "instructor") {
+    if (!instructor || instructor.accountType !== "instructor") {
       return next(new ApiError(403, "Forbidden: Not an instructor"));
     }
     const thumbnail = req.file?.path
@@ -296,7 +296,7 @@ const getInstructorCourses = asyncHandler(async (req, res, next) => {
       return next(new ApiError(401, "Unauthorized: Instructor ID is required"));
     }
     const instructor = await User.findById(instructorId);
-    if (!instructor || instructor.role !== "instructor") {
+    if (!instructor || instructor.accountType !== "instructor") {
       return next(new ApiError(403, "Forbidden: Not an instructor"));
     }
     const instructorCourses = await Course.find({ instructor: instructorId })

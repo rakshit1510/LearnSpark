@@ -16,7 +16,7 @@ import { ApiError } from '../utils/ApiError.js';
 const capturePayment = asyncHandler(async (req, res) => {
   try {
     const { coursesId } = req.body;
-    const userId = req.user.id;
+    const userId = req.user._id;
 
     if (!userId) throw new ApiError(400, "User ID is missing");
 

@@ -19,7 +19,7 @@ const createSubSection = asyncHandler(async (req, res) => {
         if (!user) {
             throw new ApiError(404, "User not found");
         }
-        if (user.role !== "admin" && user.role !== "instructor") {
+        if (user.accountType !== "admin" && user.accountType !== "instructor") {
             throw new ApiError(403, "User does not have permission to create subsections");
         }
         if (!video) {
@@ -73,7 +73,7 @@ const updateSubSection = asyncHandler(async (req, res) => {
         if (!user) {
             throw new ApiError(404, "User not found");
         }
-        if (user.role !== "admin" && user.role !== "instructor") {
+        if (user.accountType !== "admin" && user.accountType !== "instructor") {
             throw new ApiError(403, "User does not have permission to update subsections");
         }
         if(!sectionId || !subSectionId) {
@@ -131,7 +131,7 @@ const deleteSubSection = asyncHandler(async (req, res) => {
         if (!user) {
             throw new ApiError(404, "User not found");
         }
-        if (user.role !== "admin" && user.role !== "instructor") {
+        if (user.accountType !== "admin" && user.accountType !== "instructor") {
             throw new ApiError(403, "User does not have permission to delete subsections");
         }
         if (!subSectionId || !sectionId) {

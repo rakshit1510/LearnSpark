@@ -18,7 +18,7 @@ const createSection = asyncHandler(async (req, res) => {
         }
 
         const user = await User.findById(userId);
-        if(user.role !== "admin" && user.role !== "instructor") {
+        if(user.accountType !== "admin" && user.accountType !== "instructor") {
             throw new ApiError(403, "User does not have permission to create sections.");
         }
         if (!user) {
@@ -70,7 +70,7 @@ const updateSection = asyncHandler(async (req, res) => {
             throw new ApiError(401, "User not authenticated.");
         }
         const user = await User.findById(userId);
-        if (user.role !== "admin" && user.role !== "instructor") {
+        if (user.accountType !== "admin" && user.accountType !== "instructor") {
             throw new ApiError(403, "User does not have permission to update sections.");
         }
         if (!user) {
@@ -113,7 +113,7 @@ const deleteSection = asyncHandler(async (req, res) => {
             throw new ApiError(401, "User not authenticated.");
         }
         const user = await User.findById(userId);
-        if (user.role !== "admin" && user.role !== "instructor") {
+        if (user.accountType !== "admin" && user.accountType !== "instructor") {
             throw new ApiError(403, "User does not have permission to delete sections.");
         }
         if (!user) {
