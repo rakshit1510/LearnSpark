@@ -1,13 +1,33 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Vite + React</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
-  </body>
+
+<head>
+  <!-- Basic Meta Tags -->
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- Title & Favicon -->
+  <title>LearnSpark</title>
+  <link rel="icon" type="image/png" href="/learnspark-logo.png" />
+
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" />
+
+  <!-- SEO Tags -->
+  <meta name="description" content="LearnSpark - Light up your future with top-tier online tech education." />
+  <meta name="author" content="LearnSpark" />
+</head>
+
+<body style="margin: 0; font-family: 'Inter', sans-serif; background-color: #ffffff; color: #222;">
+
+  <!-- React App Mount Point -->
+  <div id="root"></div>
+
+  <!-- Main Application Script -->
+  <script type="module" src="/src/main.jsx"></script>
+
+  <!-- Polyfill for Global Compatibility (React library fix) -->
+  <script>const global = globalThis;</script>
+</body>
+
 </html>
