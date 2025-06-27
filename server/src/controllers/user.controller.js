@@ -79,7 +79,7 @@ const sendOTP= asyncHandler(async (req, res) => {
 const signup = asyncHandler(async (req, res) => {
     try {
         const { firstName, lastName, email, password, confirmPassword, accountType, contactNumber, otp } = req.body;
-        if (!firstName || !lastName || !email || !password || !confirmPassword || !accountType || !contactNumber || !otp) {
+        if (!firstName || !lastName || !email || !password || !confirmPassword || !accountType  || !otp) {
             throw new ApiError(400, "All fields are required");
         }
         if (password !== confirmPassword) {
@@ -89,12 +89,13 @@ const signup = asyncHandler(async (req, res) => {
         if (checkUserAlreadyExists) {
             throw new ApiError(400, "User already exists with this email");
         }
-
+        
         // Find the most recent OTP for this email
         const recentOtp = await OTP.findOne({ email: email.toLowerCase() }).sort({ createdAt: -1 });
-
+        
         if (!recentOtp) {
             throw new ApiError(400, "OTP not found or expired");
+            console.log("Signup request received",firstName, lastName, email, password, confirmPassword, accountType, contactNumber, otp);
         }
         if (recentOtp.otp !== otp) {
             throw new ApiError(400, "Invalid OTP");

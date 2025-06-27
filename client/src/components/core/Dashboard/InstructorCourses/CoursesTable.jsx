@@ -1,4 +1,4 @@
-
+import React from "react"
 import { useDispatch, useSelector } from "react-redux"
 
 import { Table, Thead, Tbody, Tr, Th, Td } from 'react-super-responsive-table'

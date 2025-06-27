@@ -122,7 +122,7 @@ function App() {
         />
 
         <Route
-          path="verify-email" element={
+          path="signup/verify-email" element={
             <OpenRoute>
               <VerifyEmail />
             </OpenRoute>

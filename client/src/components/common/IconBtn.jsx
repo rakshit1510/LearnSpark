@@ -1,3 +1,4 @@
+import React from "react"
 export default function IconBtn({ text, onclick, children, disabled, outline = false, customClasses, type, }) {
     return (
         <button

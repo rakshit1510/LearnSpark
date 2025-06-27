@@ -1,3 +1,4 @@
+import React from "react";
 import { useEffect, useState } from "react";
 import { createNewCategory, deleteCategory, fetchCourseCategories } from "../../../services/operations/courseDetailsAPI";
 import IconBtn from '../../common/IconBtn';

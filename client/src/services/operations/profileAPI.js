@@ -1,74 +1,102 @@
 import { toast } from "react-hot-toast"
-
 import { setLoading, setUser } from "../../slices/profileSlice"
 import { apiConnector } from "../apiConnector"
 import { profileEndpoints } from "../apis"
 import { logout } from "./authAPI"
 
-const { GET_USER_DETAILS_API, GET_USER_ENROLLED_COURSES_API, GET_INSTRUCTOR_DATA_API, } = profileEndpoints
+const {
+  GET_USER_DETAILS_API,
+  GET_USER_ENROLLED_COURSES_API,
+  GET_INSTRUCTOR_DATA_API,
+} = profileEndpoints
 
-
-// ================ get User Details  ================
+// ================ Get User Details ================
 export function getUserDetails(token, navigate) {
   return async (dispatch) => {
     const toastId = toast.loading("Loading...")
     dispatch(setLoading(true))
+
     try {
-      const response = await apiConnector("GET", GET_USER_DETAILS_API, null, { Authorization: `Bearer ${token}`, })
+      const response = await apiConnector(
+        "GET",
+        GET_USER_DETAILS_API,
+        null,
+        { Authorization: `Bearer ${token}` }
+      )
+
       console.log("GET_USER_DETAILS API RESPONSE............", response)
 
-      if (!response.data.success) {
+      if (response.data.statusCode !== 200) {
         throw new Error(response.data.message)
       }
-      const userImage = response.data.data.image
-        ? response.data.data.image
-        : `https://api.dicebear.com/5.x/initials/svg?seed=${response.data.data.firstName} ${response.data.data.lastName}`
-      dispatch(setUser({ ...response.data.data, image: userImage }))
+
+      const user = response.data.data
+
+      const userImage = user.image
+        ? user.image
+        : `https://api.dicebear.com/5.x/initials/svg?seed=${user.firstName} ${user.lastName}`
+
+      dispatch(setUser({ ...user, image: userImage }))
     } catch (error) {
-      dispatch(logout(navigate))
       console.log("GET_USER_DETAILS API ERROR............", error)
-      toast.error("Could Not Get User Details")
+      dispatch(logout(navigate))
+      toast.error(error?.response?.data?.message || "Could Not Get User Details")
     }
+
     toast.dismiss(toastId)
     dispatch(setLoading(false))
   }
 }
 
-// ================ get User Enrolled Courses  ================
+// ================ Get User Enrolled Courses ================
 export async function getUserEnrolledCourses(token) {
-  // const toastId = toast.loading("Loading...")
-  let result = []
   try {
-    const response = await apiConnector("GET", GET_USER_ENROLLED_COURSES_API, { token }, { Authorization: `Bearer ${token}`, })
+    const response = await apiConnector(
+      "GET",
+      GET_USER_ENROLLED_COURSES_API,
+      null,
+      { Authorization: `Bearer ${token}` }
+    );
 
-    console.log("GET_USER_ENROLLED_COURSES_API API RESPONSE............", response)
+    console.log("GET_USER_ENROLLED_COURSES_API RESPONSE:", response);
 
-    if (!response.data.success) {
-      throw new Error(response.data.message)
+    // Check for success based on your ApiResponse format
+    if (response.data.statusCode !== 200 || !response.data.success) {
+      throw new Error(response.data.message || "Failed to fetch enrolled courses");
     }
-    result = response.data.data
+
+    // Always return the array (data) directly
+    return response.data.data || [];
   } catch (error) {
-    console.log("GET_USER_ENROLLED_COURSES_API API ERROR............", error)
-    toast.error("Could Not Get Enrolled Courses")
+    console.log("GET_USER_ENROLLED_COURSES_API ERROR:", error);
+    toast.error(error?.response?.data?.message || "Could not fetch enrolled courses");
+    return []; // Return empty array on failure to avoid .map crash
   }
-  // toast.dismiss(toastId)
-  return result
 }
 
-// ================ get Instructor Data  ================
+// ================ Get Instructor Data ================
 export async function getInstructorData(token) {
-  // const toastId = toast.loading("Loading...")
   let result = []
+
   try {
-    const response = await apiConnector("GET", GET_INSTRUCTOR_DATA_API, null, {
-      Authorization: `Bearer ${token}`,
-    })
-    console.log("GET_INSTRUCTOR_DATA_API API RESPONSE............", response)
-    result = response?.data?.courses
+    const response = await apiConnector(
+      "GET",
+      GET_INSTRUCTOR_DATA_API,
+      null,
+      { Authorization: `Bearer ${token}` }
+    )
+
+    console.log("GET_INSTRUCTOR_DATA_API RESPONSE............", response)
+
+    if (response.data.statusCode !== 200) {
+      throw new Error(response.data.message)
+    }
+
+    result = response.data.data
   } catch (error) {
-    console.log("GET_INSTRUCTOR_DATA_API API ERROR............", error)
-    toast.error("Could Not Get Instructor Data")
+    console.log("GET_INSTRUCTOR_DATA_API ERROR............", error)
+    toast.error(error?.response?.data?.message || "Could Not Get Instructor Data")
   }
-  // toast.dismiss(toastId)
+
   return result
 }

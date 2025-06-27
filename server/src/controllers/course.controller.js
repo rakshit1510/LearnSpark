@@ -89,10 +89,10 @@ const createCourse = asyncHandler(async (req, res, next) => {
       { new: true }
     );
     return res.status(201).json(
-      new ApiResponse(201, "Course created successfully", {
+      new ApiResponse(201,{
         course,
         thumbnail: thumbnail ? thumbnail.secure_url : null,
-      })
+      }, "Course created successfully")
     );
 
 
@@ -118,7 +118,7 @@ const getAllCourses = asyncHandler(async (req, res, next) => {
     }
 
     return res.status(200).json(
-      new ApiResponse(200, "All courses retrieved successfully", allCourses)
+      new ApiResponse(200, allCourses,"All courses retrieved successfully")
     );
   } catch (error) {
     return next(new ApiError(500, "Failed to get all courses", error.message));
@@ -166,10 +166,10 @@ const getCourseDetails = asyncHandler(async (req, res, next) => {
 
         const totalDuration = convertSecondsToDuration(totalDurationInSeconds)
     return res.status(200).json(
-      new ApiResponse(200, "Course details retrieved successfully", {
+      new ApiResponse(200, {
         courseDetails,
         totalDuration,
-      })
+      },"Course details retrieved successfully")
     );
 
   } catch (error) {
@@ -220,11 +220,11 @@ if (!user) {
     const totalDuration = convertSecondsToDuration(totalDurationInSeconds);
 
     return res.status(200).json(
-        new ApiResponse(200, "Full course details retrieved successfully", {
+        new ApiResponse(200, {
             courseDetails,
             totalDuration,
             completedVideos: courseProgress?.completedVideos || [],
-        })
+        }, "Full course details retrieved successfully")
     );
 } catch (error) {
     return next(new ApiError(500, "Failed to get full course details", error.message));
@@ -279,9 +279,9 @@ const editCourse = asyncHandler(async (req, res, next) => {
       return next(new ApiError(404, "Updated course not found"));
     }
     return res.status(200).json(
-      new ApiResponse(200, "Course edited successfully", {
+      new ApiResponse(200, {
         updatedCourse,
-      })
+      },"Course edited successfully")
     );
 
   } catch (error) {

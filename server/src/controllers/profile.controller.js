@@ -113,43 +113,49 @@ const getUserDetails = asyncHandler(async (req, res) => {
   }
 });
 
-
 const updateUserProfileImage = asyncHandler(async (req, res) => {
-    try {
-        const profileImage=req.file?.profileImage; // Assuming the image is uploaded using multer and available in req.file
-        const userId = req.user._id; // ✅ fixed destructuring
-        if (!profileImage) {
-            throw new ApiError(400, "Profile image is required");
-        }
+  try {
+    const profileImage = req.file;
+    const userId = req.user._id;
 
-        const imageUrl = await uploadOnCloudinary(profileImage.path, "profile_images");
-        if (!imageUrl) {
-            throw new ApiError(500, "Failed to upload image to Cloudinary");
-        }
-        const user = await User.findById(userId);
-        if (!user) {
-            throw new ApiError(404, "User not found");
-        }   
-        // Delete old image from Cloudinary if it exists
-        if (user.image) {
-            await deleteFromCloudinary(user.image);
-        }   
-        const updatedUser = await User.findByIdAndUpdate(
-            userId,
-            { image: imageUrl },
-            { new: true }
-        ).select("-password -refreshToken"); // Exclude sensitive fields
-        if (!updatedUser) {
-            throw new ApiError(404, "Failed to update user profile image");
-        }
-        return res.status(200).json(new ApiResponse(200, "Profile image updated successfully", updatedUser));
-    } catch (error) {
-        console.error(error); // helpful for debugging
-        throw new ApiError(500, "Internal Server Error in updateUserProfileImage"); 
-        
+    console.log("updating", profileImage);
+    if (!profileImage) {
+      throw new ApiError(400, "Profile image is required");
     }
-});
 
+    const imageUrl = await uploadOnCloudinary(profileImage.path, "profile_images");
+
+    if (!imageUrl || !imageUrl.secure_url) {
+      throw new ApiError(500, "Failed to upload image to Cloudinary");
+    }
+
+    const user = await User.findById(userId);
+    if (!user) {
+      throw new ApiError(404, "User not found");
+    }
+
+    if (user.image) {
+      await deleteFromCloudinary(user.image);
+    }
+
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      { image: imageUrl.secure_url }, // ✅ store only the URL
+      { new: true }
+    ).select("-password -refreshToken");
+
+    if (!updatedUser) {
+      throw new ApiError(404, "Failed to update user profile image");
+    }
+
+    return res.status(200).json(
+      new ApiResponse(200, updatedUser, "Profile image updated successfully")
+    );
+  } catch (error) {
+    console.error(error);
+    throw new ApiError(500, "Internal Server Error in updateUserProfileImage");
+  }
+});
 
 const getEnrolledCourses = asyncHandler(async (req, res) => {
     try {
@@ -199,7 +205,7 @@ const getEnrolledCourses = asyncHandler(async (req, res) => {
             }
         }
 
-        return res.status(200).json(new ApiResponse(200, "Enrolled courses fetched successfully", userDetails.courses));
+        return res.status(200).json(new ApiResponse(200,  userDetails.courses,"Enrolled courses fetched successfully"));
     } catch (error) {
         console.error(error); // helpful for debugging
         throw new ApiError(500, "Internal Server Error in getEnrolledCourses");
