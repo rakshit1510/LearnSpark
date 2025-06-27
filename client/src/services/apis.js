@@ -1,12 +1,12 @@
-const BASE_URL = import.meta.env.VITE_APP_BASE_URL + "/api/v1";
+const BASE_URL = import.meta.env.VITE_APP_BASE_URL ;
 
 // AUTH ENDPOINTS
 export const endpoints = {
-  SENDOTP_API: BASE_URL + "/users/auth/sendotp",
-  SIGNUP_API: BASE_URL + "/users/auth/signup",
-  LOGIN_API: BASE_URL + "/users/auth/login",
-  RESETPASSTOKEN_API: BASE_URL + "/users/auth/reset-password-token",
-  RESETPASSWORD_API: BASE_URL + "/users/auth/reset-password",
+  SENDOTP_API: BASE_URL + "/users/sendotp",
+  SIGNUP_API: BASE_URL + "/users/signup",
+  LOGIN_API: BASE_URL + "/users/login",
+  RESETPASSTOKEN_API: BASE_URL + "/users/reset-password-token",
+  RESETPASSWORD_API: BASE_URL + "/users/reset-password",
 }
 
 // PROFILE ENDPOINTS
@@ -18,8 +18,8 @@ export const profileEndpoints = {
 
 // ADMIN ENDPOINTS
 export const adminEndPoints = {
-  GET_ALL_STUDENTS_DATA_API: BASE_URL + "/users/auth/all-students",
-  GET_ALL_INSTRUCTORS_DATA_API: BASE_URL + "/users/auth/all-instructors",
+  GET_ALL_STUDENTS_DATA_API: BASE_URL + "/users/all-students",
+  GET_ALL_INSTRUCTORS_DATA_API: BASE_URL + "/users/all-instructors",
 }
 
 // STUDENT ENDPOINTS
@@ -75,6 +75,6 @@ export const contactusEndpoint = {
 export const settingsEndpoints = {
   UPDATE_DISPLAY_PICTURE_API: BASE_URL + "/profile/updateUserProfileImage",
   UPDATE_PROFILE_API: BASE_URL + "/profile/updateProfile",
-  CHANGE_PASSWORD_API: BASE_URL + "/users/auth/changepassword",
+  CHANGE_PASSWORD_API: BASE_URL + "/users/changepassword",
   DELETE_PROFILE_API: BASE_URL + "/profile/deleteProfile",
 }

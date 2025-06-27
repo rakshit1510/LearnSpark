@@ -144,14 +144,14 @@ function getRandomInt(max) {
         if (!categoryId) {
             throw new ApiError(400, "categoryId is required");
         }
-
         // ========== Get Selected Category and Its Courses ==========
         const selectedCategory = await Category.findById(categoryId)
-            .populate({
-                path: "courses",
-                match: { status: "Published" },
-                populate: "ratingAndReviews",
-            });
+        .populate({
+            path: "courses",
+            match: { status: "Published" },
+            populate: "ratingAndReviews",
+        });
+        console.log("category",selectedCategory)
 
         if (!selectedCategory) {
             throw new ApiError(404, "Category not found");

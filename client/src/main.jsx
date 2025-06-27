@@ -11,8 +11,12 @@ import rootReducer from './reducer/index.js'
 const store = configureStore({
   reducer: rootReducer,
 })
-createRoot(document.getElementById('root')).render(
-  <BrowserRouter>
+ReactDOM.createRoot(document.getElementById('root')).render(
+  <BrowserRouter
+    future={{
+    v7_startTransition: true,
+    v7_relativeSplatPath: true,
+    }}>
   <Provider store={store}>
     <App />
     <Toaster />
