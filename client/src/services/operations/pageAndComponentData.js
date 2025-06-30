@@ -4,29 +4,27 @@ import { catalogData } from '../apis'
 
 // ================ Get Catalog Page Data ================
 export const getCatalogPageData = async (categoryId) => {
-  // const toastId = toast.loading("Loading...")
-  let result = []
+  let result = null;
 
   try {
     const response = await apiConnector(
       "POST",
       catalogData.CATALOGPAGEDATA_API,
-      { categoryId: categoryId }
-    )
+      { categoryId }
+    );
 
-    console.log("CATALOG PAGE DATA API RESPONSE............", response)
+    console.log("CATALOG PAGE DATA API RESPONSE............", response);
 
-    if (response.data.statusCode !== 200) {
-      throw new Error(response.data.message)
+    if (response?.data?.statusCode !== 200) {
+      throw new Error(response.data.message || "Could not fetch catalog data");
     }
 
-    result = response.data.data
+    result = response.data.data;
   } catch (error) {
-    console.log("CATALOG PAGE DATA API ERROR....", error)
-    // toast.error(error?.response?.data?.message || "Could not fetch catalog data")
-    result = error?.response?.data?.data || []
+    console.error("CATALOG PAGE DATA API ERROR:", error);
+    result = null;
   }
 
-  // toast.dismiss(toastId)
-  return result
-}
+  return result;
+};
+

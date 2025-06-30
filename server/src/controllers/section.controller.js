@@ -41,7 +41,7 @@ const createSection = asyncHandler(async (req, res) => {
         // Link this section to the course
        const updatedCourse = await Course.findByIdAndUpdate(
             courseId,
-            { $push: { sections: new_section._id } },
+            { $push: { courseContent: new_section._id } },
             { new: true }
         );
         if (!updatedCourse) {
@@ -94,7 +94,7 @@ const updateSection = asyncHandler(async (req, res) => {
             throw new ApiError(500, "Failed to update section.");
         }
         const updatedCourseDetails = await Course.findById(courseId)
-            .populate("sections", { path: 'Section' ,populate: { path: 'subSections' } })
+            .populate("sections", { path: 'courseContent' ,populate: { path: 'subSections' } })
             if (!updatedCourseDetails) {
             throw new ApiError(404, "Updated course details not found.");
         }

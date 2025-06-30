@@ -90,10 +90,9 @@ const createCourse = asyncHandler(async (req, res, next) => {
     );
     
     return res.status(201).json(
-      new ApiResponse(201,{
+      new ApiResponse(201,
         course,
-        thumbnail: thumbnail ? thumbnail.secure_url : null,
-      }, "Course created successfully")
+        "Course created successfully")
     );
 
 
@@ -237,7 +236,7 @@ const editCourse = asyncHandler(async (req, res, next) => {
     const { courseId } = req.body;
     const userId = req.user.id;
     const updates= req.body;
-    const course = await Course.findById(courseId);     
+    const course = await Course.findById(courseId);   
     if (!course) {
       return next(new ApiError(404, `Course not found with id: ${courseId}`));
     }
@@ -245,28 +244,39 @@ const editCourse = asyncHandler(async (req, res, next) => {
       return next(new ApiError(400, "No updates provided"));
     }
     if (course.instructor.toString() !== userId) {
-        return next(new ApiError(403, "You are not authorized to edit this course"));
+      return next(new ApiError(403, "You are not authorized to edit this course"));
     }
     // Check if the user is the instructor of the course
     if (req.file && req.file.path) {
       const thumbnail = await uploadOnCloudinary(
         req.file.path,
-        "courseThumbnails"
+        "image"
       );
       updates.thumbnail = thumbnail.secure_url;
     }
+    
+for (const key in updates) {
+  if (Object.prototype.hasOwnProperty.call(updates, key)) {
+    if (key === "tag" || key === "instructions") {
+      try {
+        // Only parse if it's a string
+        course[key] =
+          typeof updates[key] === "string"
+            ? JSON.parse(updates[key])
+            : updates[key]
+      } catch (err) {
+        console.error(`Failed to parse ${key}:`, err.message)
+        course[key] = [] // fallback to empty array or handle differently
+      }
+    } else {
+      course[key] = updates[key]
+    }
+  }
+}
 
-    for (const key in updates) {
-            if (updates.hasOwnProperty(key)) {
-                if (key === "tag" || key === "instructions") {
-                    course[key] = JSON.parse(updates[key])
-                } else {
-                    course[key] = updates[key]
-                }
-            }
-        }
 
-        course.updatedAt = Date.now();
+course.updatedAt = Date.now();
+// console.log("updating... ",updates)  
 
         await course.save();
 

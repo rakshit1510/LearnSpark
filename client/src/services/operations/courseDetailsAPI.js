@@ -72,7 +72,10 @@ export const getAllCourses = async () => {
 export const fetchCourseDetails = async (courseId) => {
   try {
     const res = await apiConnector("POST", COURSE_DETAILS_API, { courseId });
-    if (!res.data.success) throw new Error(res.data.message);
+    
+    const statusCode = res?.data?.statusCode
+    const data = res?.data?.data
+    if ((statusCode !== 200 && statusCode !== 201) )  throw new Error(res.data.message);
     return res.data;
   } catch (error) {
     console.log("COURSE_DETAILS_API ERROR:", error);
@@ -96,17 +99,29 @@ export const fetchCourseCategories = async () => {
     return []; // return empty array on error
   }
 };
-
 export const addCourseDetails = async (data, token) => {
   return showToast(async () => {
-    const res = await apiConnector("POST", CREATE_COURSE_API, data, {
-      "Content-Type": "multipart/form-data",
-      Authorization: `Bearer ${token}`,
-    });
-    console.log("ADD COURSE RES >>>", res)
-    if (res?.data?.statusCode!==201) throw new Error("Could not add course details");
-    toast.success("Course Added Successfully");
-    return res.data.data;
+    try {
+      const res = await apiConnector("POST", CREATE_COURSE_API, data, {
+        "Content-Type": "multipart/form-data",
+        Authorization: `Bearer ${token}`,
+      });
+
+      console.log("ADD COURSE RES >>>", res);
+
+      const apiRes = res?.data;
+
+      if (apiRes?.statusCode !== 201 || !apiRes?.status) {
+        throw new Error(apiRes?.message || "Could not add course details");
+      }
+
+      toast.success(apiRes.message || "Course added successfully");
+      return apiRes.data; // the actual course object
+    } catch (error) {
+      console.error("ADD COURSE ERROR >>>", error);
+      toast.error(error.message || "Failed to add course");
+      throw error;
+    }
   });
 };
 
@@ -116,7 +131,7 @@ export const editCourseDetails = async (data, token) => {
       "Content-Type": "multipart/form-data",
       Authorization: `Bearer ${token}`,
     });
-    if (!res?.data?.statusCode!==201) throw new Error("Could not update course");
+    if (res?.data?.statusCode!==201) throw new Error("Could not update course");
     toast.success("Course Updated");
     return res.data.data;
   });
@@ -167,7 +182,7 @@ export const createSubSection = async (data, token) => {
     const res = await apiConnector("POST", CREATE_SUBSECTION_API, data, {
       Authorization: `Bearer ${token}`,
     });
-    if (!res?.data?.success) throw new Error("Could not create subsection");
+    if (res?.data?.statusCode!==201) throw new Error("Could not create subsection");
     toast.success("Lecture Added");
     return res.data.data;
   });
@@ -240,19 +255,30 @@ export const deleteCourse = async (courseId, token) => {
   }
 };
 
-// ================ Others ================
 export const getFullDetailsOfCourse = async (courseId, token) => {
   try {
-    const res = await apiConnector("POST", GET_FULL_COURSE_DETAILS_AUTHENTICATED, { courseId }, {
-      Authorization: `Bearer ${token}`,
-    });
-    if (!res.data.success) throw new Error(res.data.message);
-    return res.data.data;
+    const res = await apiConnector(
+      "POST",
+      GET_FULL_COURSE_DETAILS_AUTHENTICATED,
+      { courseId },
+      {
+        Authorization: `Bearer ${token}`,
+      }
+    )
+
+    const statusCode = res?.data?.statusCode
+    const data = res?.data?.data
+
+    if ((statusCode !== 200 && statusCode !== 201) || !data?.courseDetails) {
+      throw new Error(res?.data?.message || "Course details not found")
+    }
+
+    return data
   } catch (error) {
-    console.log("COURSE_FULL_DETAILS_API ERROR:", error);
-    return error.response?.data || null;
+    console.error("COURSE_FULL_DETAILS_API ERROR:", error)
+    return null
   }
-};
+}
 
 export const markLectureAsComplete = async (data, token) => {
   return showToast(async () => {

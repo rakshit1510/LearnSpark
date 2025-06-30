@@ -11,7 +11,7 @@ const {
   SEND_PAYMENT_SUCCESS_EMAIL_API,
 } = studentEndpoints;
 
-// Helper: Load Razorpay SDK
+// Load Razorpay SDK
 function loadScript(src) {
   return new Promise((resolve) => {
     const script = document.createElement("script");
@@ -22,12 +22,10 @@ function loadScript(src) {
   });
 }
 
-// ================ buyCourse ================
+// Buy Course
 export async function buyCourse(token, coursesId, userDetails, navigate, dispatch) {
   const toastId = toast.loading("Loading...");
-
   try {
-    // Load Razorpay SDK
     const isLoaded = await loadScript("https://checkout.razorpay.com/v1/checkout.js");
     if (!isLoaded) {
       toast.error("Razorpay SDK failed to load");
@@ -35,27 +33,25 @@ export async function buyCourse(token, coursesId, userDetails, navigate, dispatc
       return;
     }
 
-    // Create order
     const orderResponse = await apiConnector(
       "POST",
       COURSE_PAYMENT_API,
       { coursesId },
       { Authorization: `Bearer ${token}` }
     );
-
-    if (!orderResponse?.data?.success) {
+    const statusCode = orderResponse?.data?.statusCode
+    if ((statusCode !== 200 && statusCode !== 201)) {
       throw new Error(orderResponse?.data?.message || "Order creation failed");
     }
-
+    console.log("response",orderResponse)     
     const RAZORPAY_KEY = import.meta.env.VITE_APP_RAZORPAY_KEY;
 
-    // Razorpay options
     const options = {
       key: RAZORPAY_KEY,
       currency: orderResponse.data.message.currency,
       amount: orderResponse.data.message.amount,
       order_id: orderResponse.data.message.id,
-      name: "StudyNotion",
+      name: "LearnSpark",
       description: "Thank You for Purchasing the Course",
       image: rzpLogo,
       prefill: {
@@ -83,7 +79,7 @@ export async function buyCourse(token, coursesId, userDetails, navigate, dispatc
   }
 }
 
-// ================ send Payment Success Email ================
+// Send Payment Success Email
 async function sendPaymentSuccessEmail(response, amount, token) {
   try {
     await apiConnector(
@@ -103,7 +99,7 @@ async function sendPaymentSuccessEmail(response, amount, token) {
   }
 }
 
-// ================ verify payment ================
+// Verify Payment
 async function verifyPayment(bodyData, token, navigate, dispatch) {
   const toastId = toast.loading("Verifying payment...");
   dispatch(setPaymentLoading(true));

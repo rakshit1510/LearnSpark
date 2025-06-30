@@ -1,74 +1,81 @@
-import React, { useEffect, useState } from "react"
-import { useParams } from "react-router-dom"
+import React, { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
 
-import Footer from "../components/common/Footer"
-import Course_Card from "../components/core/Catalog/Course_Card"
-import Course_Slider from "../components/core/Catalog/Course_Slider"
-import Loading from "../components/common/Loading"
+import Footer from "../components/common/Footer";
+import Course_Card from "../components/core/Catalog/Course_Card";
+import Course_Slider from "../components/core/Catalog/Course_Slider";
+import Loading from "../components/common/Loading";
 
-import { getCatalogPageData } from "../services/operations/pageAndComponentData"
-import { fetchCourseCategories } from "../services/operations/courseDetailsAPI"
+import { getCatalogPageData } from "../services/operations/pageAndComponentData";
+import { fetchCourseCategories } from "../services/operations/courseDetailsAPI";
 
 function Catalog() {
-  const { catalogName } = useParams()
-  const [active, setActive] = useState(1)
-  const [catalogPageData, setCatalogPageData] = useState(null)
-  const [categoryId, setCategoryId] = useState("")
-  const [loading, setLoading] = useState(false)
+  const { catalogName } = useParams();
+  const [active, setActive] = useState(1);
+  const [catalogPageData, setCatalogPageData] = useState(null);
+  const [categoryId, setCategoryId] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  // Fetch all categories and find current one
+  // Step 1: Fetch categories & extract ID
   useEffect(() => {
-    ;(async () => {
+    (async () => {
       try {
-        const res = await fetchCourseCategories()
+        const res = await fetchCourseCategories();
         const match = res.find(
           (ct) => ct.name.split(" ").join("-").toLowerCase() === catalogName
-        )
-
+        );
         if (match?._id) {
-          setCategoryId(match._id)
+          setCategoryId(match._id);
         } else {
-          console.error("Category not found.")
-          setCategoryId(null)
+          console.error("Category not found");
+          setCategoryId(null);
         }
       } catch (error) {
-        console.error("Could not fetch Categories.", error)
-        setCategoryId(null)
+        console.error("Failed to fetch categories", error);
+        setCategoryId(null);
       }
-    })()
-  }, [catalogName])
+    })();
+  }, [catalogName]);
 
-  // Fetch catalog page data using categoryId
+  // Step 2: Fetch catalog data based on categoryId
   useEffect(() => {
-    if (!categoryId) return
-    ;(async () => {
-      setLoading(true)
-      try {
-        const res = await getCatalogPageData(categoryId)
-        setCatalogPageData(res?.data || null)
-      } catch (error) {
-        console.error("Failed to fetch catalog page data:", error)
-      }
-      setLoading(false)
-    })()
-  }, [categoryId])
+    if (!categoryId) return;
 
-  // Show loading spinner
+    let isMounted = true;
+    (async () => {
+      setLoading(true);
+      try {
+        const res = await getCatalogPageData(categoryId);
+        if (isMounted) {
+          setCatalogPageData(res || null);
+        }
+      } catch (error) {
+        console.error("Failed to fetch catalog page data:", error);
+      }
+      setLoading(false);
+    })();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [categoryId]);
+
+  // Show loading
   if (loading) {
     return (
       <div className="grid min-h-[calc(100vh-3.5rem)] place-items-center">
         <Loading />
       </div>
-    )
+    );
   }
 
-  // If no data
+  // No data found
   if (!loading && !catalogPageData) {
     return (
       <div className="text-white text-4xl flex justify-center items-center mt-[20%]">
         No Courses found for selected Category
       </div>
-    )
+    );
   }
 
   return (
@@ -91,7 +98,7 @@ function Catalog() {
         </div>
       </div>
 
-      {/* Section 1 - Most Popular / New */}
+      {/* Section 1 - Courses to get started */}
       <div className="mx-auto box-content w-full max-w-maxContentTab px-4 py-12 lg:max-w-maxContent">
         <div className="section_heading">Courses to get you started</div>
         <div className="my-4 flex border-b border-b-richblack-600 text-sm">
@@ -144,11 +151,7 @@ function Catalog() {
           <div className="py-8">
             <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
               {catalogPageData.mostSellingCourses.slice(0, 4).map((course, i) => (
-                <Course_Card
-                  course={course}
-                  key={i}
-                  Height={"h-[300px]"}
-                />
+                <Course_Card course={course} key={i} Height={"h-[300px]"} />
               ))}
             </div>
           </div>
@@ -157,7 +160,7 @@ function Catalog() {
 
       <Footer />
     </>
-  )
+  );
 }
 
-export default Catalog
+export default Catalog;

@@ -12,6 +12,7 @@ const createSubSection = asyncHandler(async (req, res) => {
         const { title, description, sectionId } = req.body;
         const userId = req.user._id;
         const video = req.file ? await uploadOnCloudinary(req.file.path, "subsections") : null;
+        console.log("video..",video)
         if (!userId) {
             throw new ApiError(401, "User not authenticated");
         }
@@ -19,7 +20,7 @@ const createSubSection = asyncHandler(async (req, res) => {
         if (!user) {
             throw new ApiError(404, "User not found");
         }
-        if (user.accountType !== "admin" && user.accountType !== "instructor") {
+        if (user.accountType !== "Admin" && user.accountType !== "Instructor") {
             throw new ApiError(403, "User does not have permission to create subsections");
         }
         if (!video) {
@@ -35,22 +36,23 @@ const createSubSection = asyncHandler(async (req, res) => {
         if (!title || !description || !sectionId) {
             throw new ApiError(400, "All fields are required");
         }
-
-       const SubSectionDetails = await SubSection.create({
+        
+        const SubSectionDetails = await SubSection.create({
             title,
             timeDuration: video.duration,
             description,
             videoUrl: video.secure_url
         });
+        console.log("subsection",SubSectionDetails)
         if (!SubSectionDetails) {
             throw new ApiError(500, "Failed to create subsection"); 
         }
-      const updatedSection = await Section.findByIdAndUpdate(
+        const updatedSection = await Section.findByIdAndUpdate(
             { _id: sectionId },
             { $push: { subSection: SubSectionDetails._id } },
             { new: true }
         ).populate("subSection")
-        .populate("course", "courseName courseImage");
+        console.log("creating...")
         if (!updatedSection) {
             throw new ApiError(500, "Failed to update section with new subsection");
         }
@@ -73,7 +75,7 @@ const updateSubSection = asyncHandler(async (req, res) => {
         if (!user) {
             throw new ApiError(404, "User not found");
         }
-        if (user.accountType !== "admin" && user.accountType !== "instructor") {
+        if (user.accountType !== "Admin" && user.accountType !== "Instructor") {
             throw new ApiError(403, "User does not have permission to update subsections");
         }
         if(!sectionId || !subSectionId) {
@@ -131,7 +133,7 @@ const deleteSubSection = asyncHandler(async (req, res) => {
         if (!user) {
             throw new ApiError(404, "User not found");
         }
-        if (user.accountType !== "admin" && user.accountType !== "instructor") {
+        if (user.accountType !== "Admin" && user.accountType !== "Instructor") {
             throw new ApiError(403, "User does not have permission to delete subsections");
         }
         if (!subSectionId || !sectionId) {

@@ -1,9 +1,10 @@
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 import { useForm } from "react-hook-form"
 import { toast } from "react-hot-toast"
 import { IoAddCircleOutline } from "react-icons/io5"
 import { MdNavigateNext } from "react-icons/md"
 import { useDispatch, useSelector } from "react-redux"
+import { useNavigate } from "react-router-dom"
 
 import {
   createSection,
@@ -27,39 +28,43 @@ export default function CourseBuilderForm() {
   } = useForm()
 
   const dispatch = useDispatch()
+  const navigate = useNavigate()
+
   const course = useSelector((state) => state.course.course)
-  console.log("courseContent",course.course.courseContent)
   const { token } = useSelector((state) => state.auth)
 
   const [loading, setLoading] = useState(false)
   const [editSectionName, setEditSectionName] = useState(null)
+
+  // 🔁 Redirect to Step 1 if course is missing or invalid
+  useEffect(() => {
+    if (!course || !Array.isArray(course.courseContent)) {
+      toast.error("Course not found. Redirecting to step 1.")
+      dispatch(setStep(1))
+      dispatch(setEditCourse(false))
+      navigate("/dashboard/add-course") // ⬅️ update route if different
+    }
+  }, [course, dispatch, navigate])
 
   const onSubmit = async (data) => {
     setLoading(true)
     let result
 
     try {
+      const sectionData = {
+        sectionName: data.sectionName,
+        courseId: course._id,
+      }
+
       if (editSectionName) {
-        result = await updateSection(
-          {
-            sectionName: data.sectionName,
-            sectionId: editSectionName,
-            courseId: course.course._id,
-          },
-          token
-        )
+        sectionData.sectionId = editSectionName
+        result = await updateSection(sectionData, token)
       } else {
-        result = await createSection(
-          {
-            sectionName: data.sectionName,
-            courseId: course.course._id,
-          },
-          token
-        )
+        result = await createSection(sectionData, token)
       }
 
       if (result) {
-        dispatch(setCourse(result)) // result is updatedCourse
+        dispatch(setCourse(result))
         setEditSectionName(null)
         setValue("sectionName", "")
       } else {
@@ -81,10 +86,10 @@ export default function CourseBuilderForm() {
   const handleChangeEditSectionName = (sectionId, sectionName) => {
     if (editSectionName === sectionId) {
       cancelEdit()
-      return
+    } else {
+      setEditSectionName(sectionId)
+      setValue("sectionName", sectionName)
     }
-    setEditSectionName(sectionId)
-    setValue("sectionName", sectionName)
   }
 
   const goBack = () => {
@@ -93,21 +98,20 @@ export default function CourseBuilderForm() {
   }
 
   const goToNext = () => {
-    if (!course.course.courseContent || course.course.courseContent.length === 0) {
+    if (!Array.isArray(course.courseContent) || course.courseContent.length === 0) {
       toast.error("Please add at least one section")
       return
     }
-    
-    const hasEmptySubsections = course.course.courseContent.some(
+
+    const hasEmptySubsections = course.courseContent.some(
       (section) => !section.subSection || section.subSection.length === 0
     )
-    
+
     if (hasEmptySubsections) {
       toast.error("Please add at least one lecture in each section")
       return
     }
-    
-    console.log(course.course.courseContent);
+
     dispatch(setStep(3))
   }
 
@@ -116,6 +120,7 @@ export default function CourseBuilderForm() {
       <p className="text-2xl font-semibold text-richblack-5">Course Builder</p>
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+        {/* Section Name */}
         <div className="flex flex-col space-y-2">
           <label className="text-sm text-richblack-5" htmlFor="sectionName">
             Section Name <sup className="text-pink-200">*</sup>
@@ -155,15 +160,16 @@ export default function CourseBuilderForm() {
           )}
         </div>
       </form>
-          
-      {course.course.courseContent && course.course.courseContent.length >0 && 
-      Array.isArray(course.course.courseContent) &&
-        course.course.courseContent.length > 0 && (
+
+      {/* Section + Lecture List */}
+      {Array.isArray(course.courseContent) &&
+        course.courseContent.length > 0 && (
           <NestedView
             handleChangeEditSectionName={handleChangeEditSectionName}
           />
         )}
 
+      {/* Footer Buttons */}
       <div className="flex justify-end gap-x-3">
         <button
           onClick={goBack}
