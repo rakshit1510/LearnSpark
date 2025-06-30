@@ -12,19 +12,20 @@ const createSection = asyncHandler(async (req, res) => {
     try {
         const { courseId, sectionName } = req.body;
         const userId = req.user._id;
-
+        console.log("course_id",courseId)
         if (!userId) {
             throw new ApiError(401, "User not authenticated.");
         }
-
+        
         const user = await User.findById(userId);
-        if(user.accountType !== "admin" && user.accountType !== "instructor") {
+        if(user.accountType !== "Admin" && user.accountType !== "Instructor") {
             throw new ApiError(403, "User does not have permission to create sections.");
         }
         if (!user) {
             throw new ApiError(404, "User not found.");
         }
         if (!courseId || !sectionName) {
+            console.log("creating...")
             throw new ApiError(400, "Course ID and section name are required.");
         }
 
@@ -70,7 +71,7 @@ const updateSection = asyncHandler(async (req, res) => {
             throw new ApiError(401, "User not authenticated.");
         }
         const user = await User.findById(userId);
-        if (user.accountType !== "admin" && user.accountType !== "instructor") {
+        if (user.accountType !== "Admin" && user.accountType !== "Instructor") {
             throw new ApiError(403, "User does not have permission to update sections.");
         }
         if (!user) {

@@ -267,10 +267,10 @@ const getAllStudents = asyncHandler(async (req, res) => {
         if (!allStudentsDetails || allStudentsDetails.length === 0) {
             throw new ApiError(404, "No students found");
         }
-        return res.status(200).json(new ApiResponse(200, "All students fetched successfully", {
+        return res.status(200).json(new ApiResponse(200, {
             students: allStudentsDetails,
             totalStudents: studentsCount
-        }));
+        },"All students fetched successfully"));
     } catch (error) {
         console.error(error); // helpful for debugging
         throw new ApiError(500, "Internal Server Error in getAllStudents");
@@ -295,11 +295,12 @@ const getAllInstructors = asyncHandler(async (req, res) => {
         if (!allInstructorsDetails || allInstructorsDetails.length === 0) {
             throw new ApiError(404, "No instructors found");
         }
-        return res.status(200).json(new ApiResponse(200, "All instructors fetched successfully", {
+        return res.status(200).json(new ApiResponse(200,  {
             instructors: allInstructorsDetails,
             totalInstructors: instructorsCount
-        }));
+        },"All instructors fetched successfully"));
     } catch (error) {
+      
         console.error(error); // helpful for debugging
         throw new ApiError(500, "Internal Server Error in getAllInstructors");
         

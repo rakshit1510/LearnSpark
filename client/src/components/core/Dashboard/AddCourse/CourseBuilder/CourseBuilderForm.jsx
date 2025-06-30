@@ -1,59 +1,83 @@
-import React from "react"
-import { useState } from "react"
+import React, { useState } from "react"
 import { useForm } from "react-hook-form"
 import { toast } from "react-hot-toast"
 import { IoAddCircleOutline } from "react-icons/io5"
 import { MdNavigateNext } from "react-icons/md"
 import { useDispatch, useSelector } from "react-redux"
-import { createSection, updateSection } from "../../../../../services/operations/courseDetailsAPI"
-import { setCourse, setEditCourse, setStep, } from "../../../../../slices/courseSlice"
+
+import {
+  createSection,
+  updateSection,
+} from "../../../../../services/operations/courseDetailsAPI"
+import {
+  setCourse,
+  setEditCourse,
+  setStep,
+} from "../../../../../slices/courseSlice"
 
 import IconBtn from "../../../../common/IconBtn"
 import NestedView from "./NestedView"
 
-
-
-
 export default function CourseBuilderForm() {
-  const { register, handleSubmit, setValue, formState: { errors }, } = useForm()
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    formState: { errors },
+  } = useForm()
 
-  const { course } = useSelector((state) => state.course)
-  const { token } = useSelector((state) => state.auth)
   const dispatch = useDispatch()
+  const course = useSelector((state) => state.course.course)
+  console.log("courseContent",course.course.courseContent)
+  const { token } = useSelector((state) => state.auth)
 
   const [loading, setLoading] = useState(false)
-  const [editSectionName, setEditSectionName] = useState(null) // stored section ID
+  const [editSectionName, setEditSectionName] = useState(null)
 
-  // handle form submission
   const onSubmit = async (data) => {
-    // console.log("sent data ", data)
     setLoading(true)
-
     let result
 
-    if (editSectionName) {
-      result = await updateSection({ sectionName: data.sectionName, sectionId: editSectionName, courseId: course._id, }, token)
-      // console.log("edit = ", result)
-    } else {
-      result = await createSection(
-        { sectionName: data.sectionName, courseId: course._id, }, token)
+    try {
+      if (editSectionName) {
+        result = await updateSection(
+          {
+            sectionName: data.sectionName,
+            sectionId: editSectionName,
+            courseId: course.course._id,
+          },
+          token
+        )
+      } else {
+        result = await createSection(
+          {
+            sectionName: data.sectionName,
+            courseId: course.course._id,
+          },
+          token
+        )
+      }
+
+      if (result) {
+        dispatch(setCourse(result)) // result is updatedCourse
+        setEditSectionName(null)
+        setValue("sectionName", "")
+      } else {
+        toast.error("Could not update course content")
+      }
+    } catch (err) {
+      console.log(err)
+      toast.error("Failed to save section")
     }
-    // console.log("section result = ", result)
-    if (result) {
-      dispatch(setCourse(result))
-      setEditSectionName(null)
-      setValue("sectionName", "")
-    }
+
     setLoading(false)
   }
 
-  // cancel edit
   const cancelEdit = () => {
     setEditSectionName(null)
     setValue("sectionName", "")
   }
 
-  // Change Edit SectionName
   const handleChangeEditSectionName = (sectionId, sectionName) => {
     if (editSectionName === sectionId) {
       cancelEdit()
@@ -63,25 +87,28 @@ export default function CourseBuilderForm() {
     setValue("sectionName", sectionName)
   }
 
-  // go To Next
-  const goToNext = () => {
-    if (course.courseContent.length === 0) {
-      toast.error("Please add atleast one section")
-      return;
-    }
-    if (course.courseContent.some((section) => section.subSection.length === 0)) {
-      toast.error("Please add atleast one lecture in each section")
-      return;
-    }
-
-    // all set go ahead
-    dispatch(setStep(3))
-  }
-
-  // go Back
   const goBack = () => {
     dispatch(setStep(1))
     dispatch(setEditCourse(true))
+  }
+
+  const goToNext = () => {
+    if (!course.course.courseContent || course.course.courseContent.length === 0) {
+      toast.error("Please add at least one section")
+      return
+    }
+    
+    const hasEmptySubsections = course.course.courseContent.some(
+      (section) => !section.subSection || section.subSection.length === 0
+    )
+    
+    if (hasEmptySubsections) {
+      toast.error("Please add at least one lecture in each section")
+      return
+    }
+    
+    console.log(course.course.courseContent);
+    dispatch(setStep(3))
   }
 
   return (
@@ -89,7 +116,6 @@ export default function CourseBuilderForm() {
       <p className="text-2xl font-semibold text-richblack-5">Course Builder</p>
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-        {/* Section Name */}
         <div className="flex flex-col space-y-2">
           <label className="text-sm text-richblack-5" htmlFor="sectionName">
             Section Name <sup className="text-pink-200">*</sup>
@@ -108,7 +134,6 @@ export default function CourseBuilderForm() {
           )}
         </div>
 
-        {/* Edit Section Name OR Create Section */}
         <div className="flex items-end gap-x-4">
           <IconBtn
             type="submit"
@@ -118,7 +143,7 @@ export default function CourseBuilderForm() {
           >
             <IoAddCircleOutline size={20} className="text-yellow-50" />
           </IconBtn>
-          {/* if editSectionName mode is on */}
+
           {editSectionName && (
             <button
               type="button"
@@ -130,22 +155,23 @@ export default function CourseBuilderForm() {
           )}
         </div>
       </form>
+          
+      {course.course.courseContent && course.course.courseContent.length >0 && 
+      Array.isArray(course.course.courseContent) &&
+        course.course.courseContent.length > 0 && (
+          <NestedView
+            handleChangeEditSectionName={handleChangeEditSectionName}
+          />
+        )}
 
-      {/* nesetd view of section - subSection */}
-      {course.courseContent.length > 0 && (
-        <NestedView handleChangeEditSectionName={handleChangeEditSectionName} />
-      )}
-
-      {/* Next Prev Button */}
       <div className="flex justify-end gap-x-3">
         <button
           onClick={goBack}
-          className={`rounded-md bg-richblack-300 py-[8px] px-[20px] font-semibold text-richblack-900`}
+          className="rounded-md bg-richblack-300 py-[8px] px-[20px] font-semibold text-richblack-900"
         >
           Back
         </button>
 
-        {/* Next button */}
         <IconBtn disabled={loading} text="Next" onclick={goToNext}>
           <MdNavigateNext />
         </IconBtn>

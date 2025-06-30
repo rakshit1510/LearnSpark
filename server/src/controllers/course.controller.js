@@ -32,7 +32,7 @@ const createCourse = asyncHandler(async (req, res, next) => {
       return next(new ApiError(401, "Unauthorized: Instructor ID is required"));
     }
     const instructor = await User.findById(instructorId);
-    if (!instructor || instructor.accountType !== "instructor") {
+    if (!instructor || instructor.accountType !== "Instructor") {
       return next(new ApiError(403, "Forbidden: Not an instructor"));
     }
     const thumbnail = req.file?.path
@@ -88,6 +88,7 @@ const createCourse = asyncHandler(async (req, res, next) => {
       { $push: { courses: course._id } },
       { new: true }
     );
+    
     return res.status(201).json(
       new ApiResponse(201,{
         course,
@@ -296,7 +297,7 @@ const getInstructorCourses = asyncHandler(async (req, res, next) => {
       return next(new ApiError(401, "Unauthorized: Instructor ID is required"));
     }
     const instructor = await User.findById(instructorId);
-    if (!instructor || instructor.accountType !== "instructor") {
+    if (!instructor || instructor.accountType !== "Instructor") {
       return next(new ApiError(403, "Forbidden: Not an instructor"));
     }
     const instructorCourses = await Course.find({ instructor: instructorId })
@@ -307,9 +308,9 @@ const getInstructorCourses = asyncHandler(async (req, res, next) => {
       return next(new ApiError(404, "No courses found for this instructor"));
     }
     return res.status(200).json(
-      new ApiResponse(200, "Instructor courses retrieved successfully", {
+      new ApiResponse(200,  {
         instructorCourses,
-      })
+      },"Instructor courses retrieved successfully")
     );
   } catch (error) {
     throw new ApiError(
@@ -322,7 +323,7 @@ const getInstructorCourses = asyncHandler(async (req, res, next) => {
 
 const deleteCourse = asyncHandler(async (req, res, next) => {
   try {
-    const { courseId } = req.body;
+    const { courseId } = req.params;
     const userId = req.user.id;
 
     const course = await Course.findById(courseId);
@@ -368,7 +369,7 @@ const deleteCourse = asyncHandler(async (req, res, next) => {
     await Course.findByIdAndDelete(courseId);
 
     return res.status(200).json(
-      new ApiResponse(200, "Course deleted successfully", null)
+      new ApiResponse(200,null, "Course deleted successfully")
     );
   } catch (error) {
     throw new ApiError(500, "Failed to delete course", error.message);

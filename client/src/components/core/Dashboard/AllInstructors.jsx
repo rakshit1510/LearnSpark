@@ -44,11 +44,9 @@ function AllInstructors() {
   useEffect(() => {
     const fetchInstructorsData = async () => {
       setLoading(true)
-      const { allInstructorsDetails, instructorsCount } = await getAllInstructorDetails(token);
-      if (allInstructorsDetails) {
-        setAllInstructorDetails(allInstructorsDetails);
-        setInstructorsCount(instructorsCount)
-      }
+      const result = await getAllInstructorDetails(token);
+setAllInstructorDetails(result.instructors);
+setInstructorsCount(result.totalInstructors);
       setLoading(false)
     };
 

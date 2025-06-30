@@ -74,10 +74,9 @@ router.route('/getFullCourseDetails')
 
 router.route('/getInstructorCourses')
     .get(verifyJWT, isInstructor, getInstructorCourses);
-
-router.route('/deleteCourse')
-    .delete(verifyJWT, isInstructor, deleteCourse);
-
+router
+  .route("/deleteCourse/:courseId")  // ✅ use courseId in URL
+  .delete(verifyJWT, isInstructor, deleteCourse);
 router.route('/updateCourseProgress')
     .post(verifyJWT, isStudent, updateCourseProgress);
 

@@ -107,7 +107,7 @@ export default function CourseInformationForm() {
           formData.append("instructions", JSON.stringify(data.courseRequirements))
         }
         if (currentValues.courseImage !== course.thumbnail) {
-          formData.append("thumbnailImage", data.courseImage)
+          formData.append("thumbnail", data.courseImage)
         }
 
         // send data to backend
@@ -134,7 +134,7 @@ export default function CourseInformationForm() {
     formData.append("category", data.courseCategory)
     formData.append("status", COURSE_STATUS.DRAFT)
     formData.append("instructions", JSON.stringify(data.courseRequirements))
-    formData.append("thumbnailImage", data.courseImage)
+    formData.append("thumbnail", data.courseImage)
     setLoading(true)
     const result = await addCourseDetails(formData, token)
     if (result) {

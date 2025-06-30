@@ -103,7 +103,8 @@ export const addCourseDetails = async (data, token) => {
       "Content-Type": "multipart/form-data",
       Authorization: `Bearer ${token}`,
     });
-    if (!res?.data?.success) throw new Error("Could not add course details");
+    console.log("ADD COURSE RES >>>", res)
+    if (res?.data?.statusCode!==201) throw new Error("Could not add course details");
     toast.success("Course Added Successfully");
     return res.data.data;
   });
@@ -115,7 +116,7 @@ export const editCourseDetails = async (data, token) => {
       "Content-Type": "multipart/form-data",
       Authorization: `Bearer ${token}`,
     });
-    if (!res?.data?.success) throw new Error("Could not update course");
+    if (!res?.data?.statusCode!==201) throw new Error("Could not update course");
     toast.success("Course Updated");
     return res.data.data;
   });
@@ -127,18 +128,24 @@ export const createSection = async (data, token) => {
     const res = await apiConnector("POST", CREATE_SECTION_API, data, {
       Authorization: `Bearer ${token}`,
     });
-    if (!res?.data?.success) throw new Error("Could not create section");
+    console.log("section",res)
+    if (res?.data?.statusCode!==201) {
+      throw new Error("Could not create section");
+    }
+
     toast.success("Section Created");
-    return res.data.updatedCourseDetails;
+
+    return res.data.data.updatedCourseDetails; // ✅ Fix here
   });
 };
+
 
 export const updateSection = async (data, token) => {
   return showToast(async () => {
     const res = await apiConnector("POST", UPDATE_SECTION_API, data, {
       Authorization: `Bearer ${token}`,
     });
-    if (!res?.data?.success) throw new Error("Could not update section");
+    if (res?.data?.statusCode!==201) throw new Error("Could not update section");
     toast.success("Section Updated");
     return res.data.data;
   });
@@ -189,30 +196,47 @@ export const deleteSubSection = async (data, token) => {
 };
 
 // ================ Instructor APIs ================
+
 export const fetchInstructorCourses = async (token) => {
   try {
     const res = await apiConnector("GET", GET_ALL_INSTRUCTOR_COURSES_API, null, {
       Authorization: `Bearer ${token}`,
     });
-    if (!res?.data?.success) throw new Error("Could not fetch instructor courses");
-    return res.data.data;
+    console.log("instrucor courses",res)
+    // ✅ Check for success
+    if (!res?.data?.statusCode === 200 || !res?.data?.data?.instructorCourses) {
+      throw new Error("Could not fetch instructor courses");
+    }
+
+    // ✅ Return only the courses array
+    return res.data.data.instructorCourses;
   } catch (error) {
     console.log("INSTRUCTOR COURSES API ERROR:", error);
-    toast.error(error.message);
+    toast.error(error.message || "Failed to fetch courses");
     return [];
   }
 };
 
-export const deleteCourse = async (data, token) => {
+// ✅ Assumes DELETE_COURSE_API = "/api/v1/course/deleteCourse"
+export const deleteCourse = async (courseId, token) => {
   try {
-    const res = await apiConnector("DELETE", DELETE_COURSE_API, data, {
-      Authorization: `Bearer ${token}`,
-    });
-    if (!res?.data?.success) throw new Error("Could not delete course");
+    const res = await apiConnector(
+      "DELETE",
+      `${DELETE_COURSE_API}/${courseId}`, // ✅ Send ID in URL
+      null,
+      {
+        Authorization: `Bearer ${token}`,
+      }
+    );
+    console.log("delete response ",res)
+    if (res?.data?.statusCode !== 200) {
+      throw new Error("Could not delete course");
+    }
+
     toast.success("Course Deleted");
   } catch (error) {
     console.log("DELETE COURSE ERROR:", error);
-    toast.error(error.message);
+    toast.error(error.message || "Failed to delete course");
   }
 };
 

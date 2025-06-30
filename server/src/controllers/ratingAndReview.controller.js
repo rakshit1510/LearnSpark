@@ -117,6 +117,7 @@ const getAllRatingReviews = asyncHandler(async (req, res) => {
             })
             .exec();
         if (!allReviews || allReviews.length === 0) {
+            
             return res.status(404).json(
                 new ApiResponse(404, null, "No reviews found")
             );

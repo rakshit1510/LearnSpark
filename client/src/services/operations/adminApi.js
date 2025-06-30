@@ -6,7 +6,10 @@ const { GET_ALL_STUDENTS_DATA_API, GET_ALL_INSTRUCTORS_DATA_API } = adminEndPoin
 
 // ================ Get All Students Data ================
 export async function getAllStudentsData(token) {
-  let result = []
+  let result = {
+    allStudentsDetails: [],
+    studentsCount: 0,
+  }
 
   try {
     const response = await apiConnector(
@@ -24,18 +27,23 @@ export async function getAllStudentsData(token) {
       throw new Error(response.data.message)
     }
 
-    result = response.data.data
+    result.allStudentsDetails = response.data.data.students
+    result.studentsCount = response.data.data.totalStudents
+
   } catch (error) {
     console.log("GET_ALL_STUDENTS_DATA_API ERROR............", error)
-    // toast.error(error?.response?.data?.message || "Could not get all students data")
   }
 
   return result
 }
 
+
 // ================ Get All Instructor Details ================
 export async function getAllInstructorDetails(token) {
-  let result = []
+  let result = {
+    allInstructorsDetails: [],
+    instructorsCount: 0
+  }
 
   try {
     const response = await apiConnector(
@@ -53,11 +61,13 @@ export async function getAllInstructorDetails(token) {
       throw new Error(response.data.message)
     }
 
-    result = response.data.data
+    result.allInstructorsDetails = response.data.data.instructors
+    result.instructorsCount = response.data.data.totalInstructors
+
   } catch (error) {
     console.log("GET_ALL_INSTRUCTORS_DATA_API ERROR............", error)
-    // toast.error(error?.response?.data?.message || "Could not get instructor data")
   }
 
   return result
 }
+

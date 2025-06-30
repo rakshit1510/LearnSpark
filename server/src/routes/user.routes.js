@@ -22,6 +22,6 @@ router.route('/logout').post(logout);
 router.route('/changepassword').post(verifyJWT, changePassword);
 router.route('/reset-password-token').post(resetPasswordToken)
 router.route('/reset-password').post(resetPassword)
-router.route('all-students').get(verifyJWT,isAdmin,getAllStudents)
+router.route('/all-students').get(verifyJWT,isAdmin,getAllStudents)
 router.route('/all-instructors').get(verifyJWT,isAdmin,getAllInstructors)
 export default router;

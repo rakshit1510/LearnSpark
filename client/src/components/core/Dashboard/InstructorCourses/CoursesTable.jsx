@@ -34,7 +34,7 @@ export default function CoursesTable({ courses, setCourses, loading, setLoading 
   const handleCourseDelete = async (courseId) => {
     setLoading(true)
     const toastId = toast.loading('Deleting...');
-    await deleteCourse({ courseId: courseId }, token)
+    await deleteCourse(courseId, token)
     const result = await fetchInstructorCourses(token)
     if (result) {
       setCourses(result)
