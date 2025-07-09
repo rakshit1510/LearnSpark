@@ -33,12 +33,13 @@ export default function Instructor() {
       setLoading(false)
     })()
   }, [])
+const totalAmount = Array.isArray(instructorData)
+  ? instructorData.reduce((acc, curr) => acc + curr.totalAmountGenerated, 0)
+  : 0;
 
-  const totalAmount = instructorData?.reduce((acc, curr) => acc + curr.totalAmountGenerated, 0)
-
-  const totalStudents = instructorData?.reduce((acc, curr) => acc + curr.totalStudentsEnrolled, 0)
-
-
+const totalStudents = Array.isArray(instructorData)
+  ? instructorData.reduce((acc, curr) => acc + curr.totalStudentsEnrolled, 0)
+  : 0;
   // skeleton loading
   const skItem = () => {
     return (

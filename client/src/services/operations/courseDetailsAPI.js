@@ -128,14 +128,19 @@ export const addCourseDetails = async (data, token) => {
 export const editCourseDetails = async (data, token) => {
   return showToast(async () => {
     const res = await apiConnector("POST", EDIT_COURSE_API, data, {
-      "Content-Type": "multipart/form-data",
       Authorization: `Bearer ${token}`,
+      // ✅ Don't set Content-Type manually when using FormData
     });
-    if (res?.data?.statusCode!==201) throw new Error("Could not update course");
+
+    if (res?.data?.statusCode !== 200) {
+      throw new Error("Could not update course");
+    }
+
     toast.success("Course Updated");
     return res.data.data;
   });
 };
+
 
 // ================ Section & Subsection APIs ================
 export const createSection = async (data, token) => {

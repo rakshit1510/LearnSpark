@@ -26,12 +26,13 @@ const updateCourseProgress = asyncHandler(async (req, res) => {
         if (!subsection) {
             throw new ApiError(404, "Subsection not found.");
         }
-
-        let courseProgress = await CourseProgress.findOne({ user: userId, course: courseId });
-
+        
+        let courseProgress = await CourseProgress.findOne({ userId: userId, courseID: courseId });
+        
         if (!courseProgress) {
             throw new ApiError(404, "Course progress not found.");
         }
+        console.log("Update Course Progress Request Body:", req.body);
 
         // Update course progress logic here
 

@@ -58,21 +58,22 @@ export async function getUserEnrolledCourses(token) {
       { Authorization: `Bearer ${token}` }
     );
 
-    console.log("GET_USER_ENROLLED_COURSES_API RESPONSE:", response);
+    
+    const nestedData = response.data; // this contains { statusCode, data, message, status }
+    console.log("GET_USER_ENROLLED_COURSES_API RESPONSE:", response.data);
 
-    // Check for success based on your ApiResponse format
-    if (response.data.statusCode !== 200 || !response.data.success) {
-      throw new Error(response.data.message || "Failed to fetch enrolled courses");
+    if (nestedData.statusCode !== 200 || !nestedData.status) {
+      throw new Error(nestedData.message || "Failed to fetch enrolled courses");
     }
 
-    // Always return the array (data) directly
-    return response.data.data || [];
+    return nestedData.data || []; // ✅ enrolled courses array
   } catch (error) {
     console.log("GET_USER_ENROLLED_COURSES_API ERROR:", error);
     toast.error(error?.response?.data?.message || "Could not fetch enrolled courses");
-    return []; // Return empty array on failure to avoid .map crash
+    return [];
   }
 }
+
 
 // ================ Get Instructor Data ================
 export async function getInstructorData(token) {

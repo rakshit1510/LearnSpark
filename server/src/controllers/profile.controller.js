@@ -240,13 +240,13 @@ const instructorDashboard = asyncHandler(async (req, res) => {
         if (!courseData || courseData.length === 0) {
             throw new ApiError(404, "No courses found for this instructor");
         }
-        return res.status(200).json(new ApiResponse(200, "Instructor dashboard data fetched successfully", courseData));
+        return res.status(200).json(new ApiResponse(200, courseData ,"Instructor dashboard data fetched successfully"));
 
     } catch (error) {
         console.error(error); // helpful for debugging
         throw new ApiError(500, "Internal Server Error in instructorDashboard");
         
-    }
+    }  
 });
 
 

@@ -26,30 +26,34 @@ const capturePayment = asyncHandler(async (req, res) => {
     if (!coursesId || !Array.isArray(coursesId) || coursesId.length === 0) {
       throw new ApiError(400, "Please provide Course Id(s)");
     }
-
     let totalAmount = 0;
-
+    
     for (const course_id of coursesId) {
       const course = await Course.findById(course_id);
       if (!course) throw new ApiError(404, "Course not found");
-
+      
       const uid = new mongoose.Types.ObjectId(userId);
       if (course.studentsEnrolled.includes(uid)) {
         throw new ApiError(400, `Already enrolled in ${course.courseName}`);
       }
-
+      
       totalAmount += course.price;
     }
-
+    
     const currency = "INR";
     const options = {
       amount: totalAmount * 100, // in paise
       currency,
       receipt: `rcpt_${Date.now()}_${Math.floor(Math.random() * 1000)}`,
     };
-
+    
+    console.log("Courses ID:", coursesId);
+    if(options.amount <= 0) {
+      await enrollStudents(coursesId, userId);
+      return res.status(200).json(new ApiResponse(200, null, "No payment required, students enrolled successfully"));
+    }
     const paymentResponse = await instance.orders.create(options);
-
+    
     res.status(200).json(new ApiResponse(200, paymentResponse, "Order created"));
   } catch (error) {
     throw new ApiError(500, error.message || "Internal server error in capturePayment");
