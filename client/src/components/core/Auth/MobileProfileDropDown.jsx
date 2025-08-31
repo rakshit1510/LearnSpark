@@ -37,13 +37,13 @@ export default function MobileProfileDropDown() {
     const navigate = useNavigate()
     const ref = useRef(null)
 
-    useOnClickOutside(ref, () => setOpen(false))
-
-
+    
+    
     const [open, setOpen] = useState(false)
     const [subLinks, setSubLinks] = useState([]);
     const [loading, setLoading] = useState(false);
-
+    
+    useOnClickOutside(ref, () => setOpen(false))
 
     const fetchSublinks = async () => {
         try {
