@@ -133,18 +133,20 @@ const showAllCategories = asyncHandler(async (req, res) => {
 const getCategoryPageDetails = asyncHandler(async (req, res) => {
   try {
     const { categoryId } = req.body;
-
+    
     if (!categoryId) {
       throw new ApiError(400, "categoryId is required");
     }
-
+    
     // Fetch selected category and populate only published courses
+    const categories = await Category.findById(categoryId);
     const selectedCategoryDoc = await Category.findById(categoryId).populate({
       path: "courses",
       match: { status: "Published" },
       populate: "ratingAndReviews",
     });
 
+    console.log("GET CATEGORY PAGE DETAILS REQ BODY:", req.body, categories, selectedCategoryDoc);
     if (!selectedCategoryDoc) {
       throw new ApiError(404, "Category not found");
     }

@@ -6,7 +6,6 @@ import SubSection from "../models/subSection.model.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
-import { use } from "react";
 import {User} from "../models/user.model.js";
 const updateCourseProgress = asyncHandler(async (req, res) => {
     try {
