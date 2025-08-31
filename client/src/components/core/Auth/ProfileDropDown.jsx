@@ -4,7 +4,7 @@ import { AiOutlineCaretDown } from "react-icons/ai"
 import { VscDashboard, VscSignOut } from "react-icons/vsc"
 import { useDispatch, useSelector } from "react-redux"
 import { Link, useNavigate } from "react-router-dom"
-import useOnClickOutside from "../../../hooks/useOnClickOutside.js"
+import useOnClickOutside from "../../../../src/hooks/useOnClickOutside.js"
 import { logout } from "../../../services/operations/authAPI"
 import Img from './../../common/Img';
 
