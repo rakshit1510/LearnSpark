@@ -1,3 +1,4 @@
+import React from "react";
 import { useEffect } from "react";
 
 // This hook detects clicks outside of the specified component and calls the provided handler function.
